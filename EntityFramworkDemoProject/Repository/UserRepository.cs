@@ -95,6 +95,26 @@ namespace EntityFramworkDemoProject.Repository
 
         public async Task<int> RegisterNewUser(UserInsertModel user)
         {
+
+            var checkqueryEmail = from u in _mycontext.tblUser where u.EmailId==user.EmailId && u.IsDeleted==false
+                             select u;
+
+            var usercheckEmail =await checkqueryEmail.SingleOrDefaultAsync<tblUser>();
+            if(usercheckEmail!=null)
+            {
+                return -1;//Email Id Duplicate
+            }
+            var checkqueryMobile = from u in _mycontext.tblUser.Where(u => u.MobileNo == user.MobileNo && u.IsDeleted == false)select u;
+           var  usercheckqueryMobile = await checkqueryMobile.SingleOrDefaultAsync<tblUser>();
+
+            if (usercheckqueryMobile != null)
+            {
+                return -2;//Mobile No Duplicate
+            }
+           
+
+
+
             tblUser ur = new tblUser();
             ur.CreatedDate = DateTime.Now;
             ur.ModifiedDate = DateTime.Now;

@@ -38,7 +38,26 @@ namespace EntityFramworkDemoProject.Controllers
                     responseDetails.ResponseData = result;
                     return Ok(responseDetails);
                 }
-
+                if (result ==-1)
+                {
+                    var returnStr = string.Format($"This Email Is Already In Use ");
+                    logger.LogInformation(returnStr);
+                    logger.LogDebug(string.Format("UserController-RegisterNewUser : This Email Is Already In Use "));
+                    responseDetails.StatusCode = StatusCodes.Status409Conflict.ToString();
+                    responseDetails.StatusMessage = returnStr;
+                    responseDetails.ResponseData = result;
+                    return Ok(responseDetails);
+                }
+                if (result == -2)
+                {
+                    var returnStr = string.Format($"This Mobile No Is Already In Use ");
+                    logger.LogInformation(returnStr);
+                    logger.LogDebug(string.Format("UserController-RegisterNewUser : This Mobile No Is Already In Use "));
+                    responseDetails.StatusCode = StatusCodes.Status409Conflict.ToString();
+                    responseDetails.StatusMessage = returnStr;
+                    responseDetails.ResponseData = result;
+                    return Ok(responseDetails);
+                }
                 else
                 {
                     var msgStr = string.Format("Error while adding User record.");

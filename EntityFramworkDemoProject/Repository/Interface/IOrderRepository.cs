@@ -10,6 +10,7 @@ namespace EntityFramworkDemoProject.Repository.Interface
         Task<long> UpdateOrder(Order order);
         Task<long> DeleteOrder(DeleteObj deleteObj);
         Task<List<Order>> GetAllOrder();
+        Task<List<GetOrdersJoin>> GetAllOrderJoinUser();
       //  Task<List<Order>> GetAllOrderPaginations(int pageNumber,int pageSize);
         Task<Order> GetOrderById(long id);
        

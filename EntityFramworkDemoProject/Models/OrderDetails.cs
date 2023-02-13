@@ -33,5 +33,12 @@ namespace EntityFramworkDemoProject.Models
 
 
     }
+    public class GetOrderDetailsJoin
+    {
+        //Id,ProductId,Qty,OrderAmmount,CreatedBy,CreateDate,ModifiedBy,ModifiedDate      
+        public string ProductName { get; set; }
+        public int Qty { get; set; }
+        public decimal OrderAmmount { get; set; }
+    }
 
 }

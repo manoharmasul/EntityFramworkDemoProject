@@ -181,5 +181,46 @@ namespace EntityFramworkDemoProject.Controllers
 
             }
         }
+        [HttpGet("GetAllOrdersJoin")]
+        public async Task<IActionResult> GetAllOrdersJoin()
+        {
+            BaseResponseStatus baseResponse = new BaseResponseStatus();
+            try
+            {
+                var result = await _orderRepository.GetAllOrderJoinUser();
+                if (result.Count() == 0 || result.Count() > 0)
+                {
+                    var rtnmsg = string.Format($"All Order Records Fetch Successfully...!");
+                    logger.LogInformation(rtnmsg);
+                    logger.LogDebug(string.Format($"OrderController-GetAllOrder : All Records Fetch Successfully.....! "));
+                    baseResponse.StatusMessage = rtnmsg;
+                    baseResponse.StatusCode = StatusCodes.Status200OK.ToString();
+                    baseResponse.ResponseData = result;
+                    return Ok(baseResponse);
+
+                }
+                else
+                {
+                    string rtnmsg = string.Format($"Error While Fetching Order Records.....!");
+                    logger.LogInformation(rtnmsg);
+                    baseResponse.StatusMessage = rtnmsg;
+                    baseResponse.StatusCode = StatusCodes.Status409Conflict.ToString();
+                    return Ok(baseResponse);
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                var rtnmsg = string.Format(ex.Message);
+                logger.LogInformation(rtnmsg);
+                baseResponse.StatusMessage = rtnmsg;
+                baseResponse.StatusCode = StatusCodes.Status409Conflict.ToString();
+
+                return Ok(baseResponse);
+
+            }
+        }
     }
 }

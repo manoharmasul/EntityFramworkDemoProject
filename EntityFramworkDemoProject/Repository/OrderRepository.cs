@@ -98,7 +98,61 @@ namespace EntityFramworkDemoProject.Repository
             return ordlist.ToList();
         }
 
-        
+        public async Task<List<GetOrdersJoin>> GetAllOrderJoinUser()
+        {
+            var query = from or in _myContext.Order join od in _myContext.tblUser
+
+                        on or.CustomerId equals od.Id select new GetOrdersJoin
+                        {
+                            Id = or.Id,
+
+                            UserName = od.UserName,
+
+                            MobileNo = od.MobileNo,
+
+                            BillingAddress = or.BillingAddress,
+
+                            ShippingAddress = or.ShippingAddress,
+
+                            OrderStatus=or.OrderStatus,
+
+                            TotalAmmount = or.TotalAmmount
+
+                        };
+            var result=await query.ToListAsync();
+
+            foreach(var item in result)
+            {
+                var queryDetails = from od in _myContext.OrderDetails
+                            join
+                          p in _myContext.Products on od.ProductId equals p.Id
+
+                            where od.OrderId == item.Id
+
+                            select new GetOrderDetailsJoin
+                            {
+                                ProductName = p.ProductName,
+                                Qty = od.Qty,
+                                OrderAmmount = od.OrderAmmount,
+                            };
+                var orddetails=await queryDetails.ToListAsync();
+
+                item.orderdetails=orddetails;
+
+
+            }
+
+            return result;
+
+                     // from s in studentList // outer sequence
+                     // join st in standardList //inner sequence 
+                      //on s.StandardID equals st.StandardID // key selector 
+                     // select new
+                     // { // result selector 
+                      //    StudentName = s.StudentName,
+                     //     StandardName = st.StandardName
+                     // };
+        }
 
         public async Task<Order> GetOrderById(long id)
         {

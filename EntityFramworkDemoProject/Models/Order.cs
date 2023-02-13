@@ -41,5 +41,23 @@ namespace EntityFramworkDemoProject.Models
         public decimal TotalAmmount { get; set; }
         public List<GetOrderDetails> orddetails { get; set; }
     }
+    public class GetOrdersJoin
+    {
+        //Id,CustomerId,BillingAddress,ShippingAddress,TotalAmmount,CreatedBy,CreateDate,ModifiedBy,ModifiedDate,Is
+        public long Id { get; set; }
+        public string UserName { get; set; }
+        public string MobileNo { get; set; }
+        public string BillingAddress { get; set; }
+        public string ShippingAddress { get; set; }
+    
+       
+        public List<GetOrderDetailsJoin> orderdetails { get; set; }
+
+        public string OrderStatus { get; set; }
+
+        public decimal TotalAmmount { get; set; }
+
+
+    }
 
 }
