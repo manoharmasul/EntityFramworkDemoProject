@@ -102,7 +102,7 @@ namespace EntityFramworkDemoProject.Repository
         {
             var query = from or in _myContext.Order join od in _myContext.tblUser
 
-                        on or.CustomerId equals od.Id select new GetOrdersJoin
+                        on or.CustomerId equals od.Id orderby or.Id descending select new GetOrdersJoin
                         {
                             Id = or.Id,
 

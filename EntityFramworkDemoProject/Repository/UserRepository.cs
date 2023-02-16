@@ -40,55 +40,42 @@ namespace EntityFramworkDemoProject.Repository
         public async Task<List<GetUserModel>> GetAllUsers()
         {
             //  Id,UserName,EmailId,MobileNo,WalletBalanc
-            List<GetUserModel> user = new List<GetUserModel>();
 
-            var result = await _mycontext.tblUser.ToListAsync();
-            foreach(var item in result)
-            {
-                GetUserModel ur = new GetUserModel();
-                ur.UserName = item.UserName;
-                ur.EmailId = item.EmailId;
-                ur.MobileNo = item.MobileNo;
-                ur.WalletBalance = item.WalletBalance;
+            var query = from u in _mycontext.tblUser where u.IsDeleted == false 
 
-                user.Add(ur);
+                      select new GetUserModel 
+                      { 
+                          Id=u.Id,UserName=u.UserName,
+                          EmailId=u.EmailId,
+                          MobileNo=u.MobileNo,
+                          WalletBalance=u.WalletBalance
+                      };
 
-            }
-            return user.ToList();
+           var  ulist = await query.ToListAsync();
+
+            return ulist.ToList();
         }
 
-       /* public async Task<List<tblUser>> GetAllUsersLinq()
-        {
-            var query = from a in _mycontext.tblUser
-                        where a.IsDeleted == false
-                        select new tblUser
-                        {
-                            //Id,UserName,EmailId,MobileNo,WalletBalance
-
-                            UserName = a.UserName,
-                            EmailId = a.EmailId,
-                            MobileNo = a.MobileNo,
-                            WalletBalance = a.WalletBalance
-                        };
-            var result = await query.ToListAsync<tblUser>();
-          
-            return result;
-                      
-        }*/
+      
 
         public async Task<GetUserModel> GetUserById(long id)
         {
-          //  Id,UserName,EmailId,MobileNo,WalletBalanc
-            GetUserModel user = new GetUserModel();
-            var result = await _mycontext.tblUser.FindAsync(id);
 
-            user.Id = result.Id;
-            user.UserName = result.UserName;
-            user.EmailId = result.EmailId;
-            user.MobileNo = result.MobileNo;
-            user.WalletBalance = result.WalletBalance;
 
-            return user;
+            var query = from u in _mycontext.tblUser
+                        where u.Id == id && u.IsDeleted == false
+                        select new GetUserModel
+                        {
+                            Id = u.Id,
+                            UserName = u.UserName,
+                            EmailId = u.EmailId,
+                            MobileNo = u.MobileNo,
+                            WalletBalance = u.WalletBalance
+                        };
+            var userlist = await query.FirstOrDefaultAsync();
+
+
+            return userlist;
         }
 
 
