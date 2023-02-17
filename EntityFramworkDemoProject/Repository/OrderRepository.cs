@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EntityFramworkDemoProject.Repository
 {
@@ -98,11 +99,16 @@ namespace EntityFramworkDemoProject.Repository
             return ordlist.ToList();
         }
 
-        public async Task<List<GetOrdersJoin>> GetAllOrderJoinUser()
+        public async Task<List<GetOrdersJoin>> GetAllOrderJoinUser(string OrderStatus)
         {
             var query = from or in _myContext.Order join od in _myContext.tblUser
 
-                        on or.CustomerId equals od.Id orderby or.Id descending select new GetOrdersJoin
+                        on or.CustomerId equals od.Id
+
+                        where or.OrderStatus == OrderStatus
+
+                        orderby or.Id descending select new GetOrdersJoin
+
                         {
                             Id = or.Id,
 
@@ -114,8 +120,9 @@ namespace EntityFramworkDemoProject.Repository
 
                             ShippingAddress = or.ShippingAddress,
 
-                            OrderStatus=or.OrderStatus,
+                            OrderStatus = or.OrderStatus,
 
+                            OrderDate = or.OrderDate,
                             TotalAmmount = or.TotalAmmount
 
                         };
@@ -144,14 +151,144 @@ namespace EntityFramworkDemoProject.Repository
 
             return result;
 
-                     // from s in studentList // outer sequence
-                     // join st in standardList //inner sequence 
-                      //on s.StandardID equals st.StandardID // key selector 
-                     // select new
-                     // { // result selector 
-                      //    StudentName = s.StudentName,
-                     //     StandardName = st.StandardName
-                     // };
+
+        }
+
+        public async Task<List<GetOrdersJoin>> GetOrderByCustIdAndStatusDate(long custId, string? orderstatus, DateTime? date)
+        {
+
+            List<GetOrdersJoin> order = new List<GetOrdersJoin>();
+
+            if (orderstatus == null && date != null)
+            {
+                var query = from o in _myContext.Order
+                            join ur in _myContext.tblUser on o.CustomerId equals ur.Id
+                            where o.CustomerId == custId && (o.OrderDate.Date == date)
+                            orderby o.Id descending
+
+                            select new GetOrdersJoin
+                            {
+                                Id = o.Id,
+                                UserName = ur.UserName,
+                                MobileNo = ur.MobileNo,
+                                BillingAddress = o.BillingAddress,
+
+                                ShippingAddress = o.ShippingAddress,
+                                OrderStatus = o.OrderStatus,
+                                OrderDate = o.OrderDate,
+
+                                TotalAmmount = o.TotalAmmount
+
+                            };
+                 order = await query.ToListAsync();
+
+            }
+            else if (date == null && orderstatus != null)
+            {
+                var query = from o in _myContext.Order
+                            join ur in _myContext.tblUser on o.CustomerId equals ur.Id
+
+                            where o.CustomerId == custId && (o.OrderStatus == orderstatus)
+
+                            orderby o.Id descending
+
+                            select new GetOrdersJoin
+                            {
+                                Id = o.Id,
+                                UserName = ur.UserName,
+                                MobileNo = ur.MobileNo,
+                                BillingAddress = o.BillingAddress,
+
+                                ShippingAddress = o.ShippingAddress,
+                                OrderStatus = o.OrderStatus,
+                                OrderDate = o.OrderDate,
+
+                                TotalAmmount = o.TotalAmmount
+
+                            };
+                 order = await query.ToListAsync();
+
+            }
+            else if (date == null && orderstatus == null)
+            {
+                var query = from o in _myContext.Order join ur in _myContext.tblUser on o.CustomerId equals ur.Id
+                            where o.CustomerId == custId 
+                            orderby o.Id descending
+                            select new GetOrdersJoin
+                            {
+                                Id = o.Id,
+                                UserName = ur.UserName,
+                                MobileNo = ur.MobileNo,
+                                BillingAddress = o.BillingAddress,
+
+                                ShippingAddress = o.ShippingAddress,
+                                OrderStatus = o.OrderStatus,
+                                OrderDate = o.OrderDate,
+
+                                TotalAmmount = o.TotalAmmount
+
+                            };
+                 order = await query.ToListAsync();
+            }
+            else
+            {
+                var query = from o in _myContext.Order
+                            join ur in _myContext.tblUser on o.CustomerId equals ur.Id
+                            where
+                            o.CustomerId == custId && (o.OrderStatus == orderstatus) && (o.OrderDate.Date == date)
+                            orderby o.Id descending
+
+                            select new GetOrdersJoin
+                            {
+
+                                Id = o.Id,
+
+                                UserName = ur.UserName,
+
+                                MobileNo = ur.MobileNo,
+
+                                BillingAddress = o.BillingAddress,
+
+                                ShippingAddress = o.ShippingAddress,
+
+                                OrderStatus = o.OrderStatus,
+
+                                OrderDate = o.OrderDate,
+
+                                TotalAmmount = o.TotalAmmount
+
+                            };
+                 order = await query.ToListAsync();
+            }
+
+           
+
+            if (order != null)
+            {
+                foreach (var o in order)
+                {
+                    var querydetails = from od in _myContext.OrderDetails
+                                       join p in _myContext.Products on od.ProductId equals (p.Id)
+                                       where od.OrderId == o.Id orderby od.Id descending
+                                       select new GetOrderDetailsJoin
+                                       {
+
+                                           ProductName = p.ProductName,
+                                           Qty = od.Qty,
+                                           OrderAmmount = od.OrderAmmount,
+
+                                       };
+
+                    var orddetailslist = await querydetails.ToListAsync();
+
+                    o.orderdetails = orddetailslist;
+                }
+            }
+
+
+
+            
+            return order;
         }
 
         public async Task<Order> GetOrderById(long id)
@@ -202,7 +339,8 @@ namespace EntityFramworkDemoProject.Repository
             ord.ModifiedBy = 0;
             ord.ModifiedDate=DateTime.Now;
             ord.TotalAmmount = 0;
-            ord.OrderStatus = "Panding";
+            ord.OrderDate = order.OrderDate;
+            ord.OrderStatus = "Pending";
 
 
             var query=_myContext.AddAsync(ord);
@@ -256,6 +394,55 @@ namespace EntityFramworkDemoProject.Repository
         public Task<long> UpdateOrder(Order order)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<long> UpdateOrderStatus(UpdateOrderStatus updatestatus)
+        {
+            long result = 0;
+            Order ord = new Order();
+
+            var queryorder = from o in _myContext.Order
+                             where o.Id == updatestatus.Id
+                             select o;
+             ord = await queryorder.FirstOrDefaultAsync();
+
+           
+
+            if (updatestatus.OrderStatus =="Delivered")
+            {
+
+                ord.DeliveredDate = DateTime.Now;
+
+                ord.OrderStatus = updatestatus.OrderStatus;
+
+                ord.ModifiedBy = updatestatus.ModifiedBy;
+
+                ord.ModifiedDate = DateTime.Now;
+
+                var upoder = _myContext.Order.Update(ord);
+
+               result = await _myContext.SaveChangesAsync();
+
+               return result;
+
+            }
+            else
+            {
+
+
+                ord.ModifiedBy = updatestatus.ModifiedBy;
+                ord.ModifiedDate = DateTime.Now;
+                ord.OrderStatus=updatestatus.OrderStatus;   
+                var upoder = _myContext.Order.Update(ord);
+
+                result = await _myContext.SaveChangesAsync();
+
+                return result;
+
+            }
+            
+
+            
         }
     }
 }

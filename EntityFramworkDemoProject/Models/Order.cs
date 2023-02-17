@@ -15,6 +15,8 @@ namespace EntityFramworkDemoProject.Models
         public List<OrderDetails> orddetails { get; set; }
         public string OrderStatus { get; set; }
         public DateTime OrderDate { get; set; }
+        public DateTime? DeliveredDate { get; set; }
+
 
     }
 
@@ -26,7 +28,16 @@ namespace EntityFramworkDemoProject.Models
         public string ShippingAddress { get; set; }
         public long CreatedBy { get; set; }
         public DateTime OrderDate { get; set; }
+        public DateTime? DeliveredDate { get; set; }
         public List<ProductAndQty> prodqty { get; set; }
+    }
+    public class UpdateOrderStatus
+    {
+        //Id,CustomerId,BillingAddress,ShippingAddress,TotalAmmount,CreatedBy,CreateDate,ModifiedBy,ModifiedDate,Is
+        public long Id { get; set; }
+        public string OrderStatus { get; set; }
+        public long ModifiedBy { get; set; }
+
     }
     public class TotalAmmountUpdate
     {
@@ -51,7 +62,7 @@ namespace EntityFramworkDemoProject.Models
         public string MobileNo { get; set; }
         public string BillingAddress { get; set; }
         public string ShippingAddress { get; set; }
-        public string OrderDate { get; set; }
+        public DateTime OrderDate { get; set; }
     
        
         public List<GetOrderDetailsJoin> orderdetails { get; set; }
