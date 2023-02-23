@@ -38,6 +38,14 @@ namespace EntityFramworkDemoProject.Controllers
                     baseresponse.ResponseData = result;
                     return Ok(baseresponse);
                 }
+                else if(result==-3)
+                {
+                    var rtnmsg = string.Format($"Product Out Of Stok");
+                    logger.LogInformation(rtnmsg);
+                    baseresponse.StatusMessage = rtnmsg;
+                    baseresponse.StatusCode = StatusCodes.Status409Conflict.ToString();
+                    return Ok(baseresponse);
+                }
                 else
                 {
                     var rtnmsg = string.Format($"Error While Adding Order");

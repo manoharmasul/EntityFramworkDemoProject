@@ -24,7 +24,7 @@ namespace EntityFramworkDemoProject.Repository
 
 
             var query = from o in _myContext.Order
-                        where o.IsDeleted==false && (o.OrderDate) >= fromDate  && (o.OrderDate)<= toDate
+                        where o.IsDeleted==false && (o.OrderDate).Date >= fromDate.Date  && (o.OrderDate).Date<= toDate.Date
                         select new Order
                         {
                            

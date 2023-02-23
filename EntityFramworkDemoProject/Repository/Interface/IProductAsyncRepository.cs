@@ -5,10 +5,10 @@ namespace EntityFramworkDemoProject.Repository.Interface
 {
     public interface IProductAsyncRepository
     {
-        Task<int> AddNewProducts(Products products);
-        Task<int> UpdateProducts(UpdateProduct products);
-        Task<List<Products>> GetAllProducts();
-        Task<Products> GetProductById(long id);
+        Task<int> AddNewProducts(ProductsInsert prod);
+        Task<int> UpdateProducts(ProductsInsert products);
+        Task<List<GetProducts>> GetAllProducts();
+        Task<GetProducts> GetProductById(long id);
         Task<int> DeleteProducts(DeleteObj deleteobj);
     }
 }

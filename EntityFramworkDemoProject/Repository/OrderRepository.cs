@@ -111,19 +111,14 @@ namespace EntityFramworkDemoProject.Repository
 
                         {
                             Id = or.Id,
-
                             UserName = od.UserName,
-
                             MobileNo = od.MobileNo,
-
                             BillingAddress = or.BillingAddress,
-
                             ShippingAddress = or.ShippingAddress,
-
                             OrderStatus = or.OrderStatus,
-
                             OrderDate = or.OrderDate,
-                            TotalAmmount = or.TotalAmmount
+                            TotalAmmount = or.TotalAmmount,
+                            DeliveredDate= or.DeliveredDate   
 
                         };
             var result=await query.ToListAsync();
@@ -324,7 +319,7 @@ namespace EntityFramworkDemoProject.Repository
 
         }
 
-        public async Task<long> PlaceNewOrder(OrderInsert order)
+        public async Task<decimal> PlaceNewOrder(OrderInsert order)
         {
             List<ProductAndQty> prodqty=new List<ProductAndQty>();  
             TotalAmmountUpdate ammountupdate=new TotalAmmountUpdate();  
@@ -336,10 +331,9 @@ namespace EntityFramworkDemoProject.Repository
             ord.CustomerId = order.CustomerId;
             ord.BillingAddress=order.BillingAddress;
             ord.ShippingAddress=order.ShippingAddress;
-            ord.ModifiedBy = 0;
-            ord.ModifiedDate=DateTime.Now;
+            ord.ModifiedBy = 0;        
             ord.TotalAmmount = 0;
-            ord.OrderDate = order.OrderDate;
+            ord.OrderDate = DateTime.Now;
             ord.OrderStatus = "Pending";
 
 
@@ -362,7 +356,7 @@ namespace EntityFramworkDemoProject.Repository
             result=await _myContext.SaveChangesAsync();
 
 
-            return result;  
+            return total;  
         }
 
         public async Task<decimal> TotalAmmountUpDate(long ordId,long customerId,long CreatedBy, List<ProductAndQty> prodanqty)
@@ -378,9 +372,12 @@ namespace EntityFramworkDemoProject.Repository
                 orddetails.OrderId=ordId;
                 orddetails.Qty=prod.Qty;
                 var product=await _myContext.Products.FindAsync(prod.ProductId);
+                product.AvailableQty-=orddetails.Qty;
+                var queryup = _myContext.Products.Update(product);
+                var updateprod=await _myContext.SaveChangesAsync(); 
+
                 orddetails.OrderAmmount = product.Price * orddetails.Qty;
-                orddetails.CreatedDate = DateTime.Now;
-                orddetails.ModifiedDate= DateTime.Now;
+                orddetails.CreatedDate = DateTime.Now;             
                 orddetails.ModifiedBy = 0;
                 orddetails.CreatedBy= CreatedBy;
                 orddetails.IsDeleted = false;

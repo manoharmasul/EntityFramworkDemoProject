@@ -5,7 +5,7 @@ namespace EntityFramworkDemoProject.Repository.Interface
 {
     public interface IOrderRepository
     {
-        Task<long> PlaceNewOrder(OrderInsert order);
+        Task<decimal> PlaceNewOrder(OrderInsert order);
         Task<decimal> TotalAmmountUpDate(long ordId,long custmerId, long CreatedBy, List<ProductAndQty> prodanqty);
         Task<long> UpdateOrder(Order order);
         Task<long> UpdateOrderStatus(UpdateOrderStatus updatestatus);

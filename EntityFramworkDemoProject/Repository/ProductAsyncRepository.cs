@@ -16,9 +16,19 @@ namespace EntityFramworkDemoProject.Repository
             _myContext = myContext;
         }
 
-        public async Task<int> AddNewProducts(Products products)
-        {  
-                
+        public async Task<int> AddNewProducts(ProductsInsert prod)
+        {
+            Products products = new Products();
+
+            products.Id = prod.Id;  
+            products.ProductName= prod.ProductName;
+            products.Price = prod.Price;
+            products.AvailableQty = prod.AvailableQty;
+            products.ProductType = prod.ProductType;
+
+
+            products.CreatedBy = prod.CreatedBy;
+            products.ModifiedBy = 0;
             products.CreatedDate = DateTime.Now;
             products.IsDeleted = false;
             var query=_myContext.AddAsync(products);
@@ -45,34 +55,61 @@ namespace EntityFramworkDemoProject.Repository
 
         }
 
-        public async Task<List<Products>> GetAllProducts()
+        public async Task<List<GetProducts>> GetAllProducts()
         {
-            var result = await _myContext.Products.ToListAsync();
+            var query = from p in _myContext.Products where p.IsDeleted == false
+                                                                            select new GetProducts
+                                                                            {
+                                                                                Id = p.Id,
+                                                                                ProductName = p.ProductName,    
+                                                                                Price=p.Price,  
+                                                                                AvailableQty=p.AvailableQty,   
+                                                                               
+                                                                            };
+            var result = await query.ToListAsync();
             return result;
         }
 
-        public async Task<Products> GetProductById(long id)
+        public async Task<GetProducts> GetProductById(long id)
         {
-            var result = await _myContext.Products.FindAsync(id);
+            var query = from p in _myContext.Products
+                        where p.Id == id && p.IsDeleted == false
 
+                        select new GetProducts
+                        {
+                            Id = p.Id,
+                            ProductName = p.ProductName,
+                            Price = p.Price,
+                            AvailableQty = p.AvailableQty,
+                        };
+
+           var result= await query.SingleOrDefaultAsync();
             return result;
         }
 
-        public async Task<int> UpdateProducts(UpdateProduct products)
+        public async Task<int> UpdateProducts(ProductsInsert products)
         {
+
             int result = 0;
-            var prod=await _myContext.Products.FindAsync(products.Id);
+
+            var queryget=from p in _myContext.Products where p.Id == products.Id select p;
+            var prod = await queryget.FirstOrDefaultAsync();
+
+
+           // var prod = await _myContext.Products.FindAsync(products.Id);
+
             if(prod==null)
             {
                 return -1;   
             }
             prod.Price= products.Price; 
-            prod.ModifiedBy=products.ModifiedBy;
+            prod.ModifiedBy=products.CreatedBy;
             prod.ProductName=products.ProductName;
             prod.AvailableQty=products.AvailableQty;         
+            prod.ModifiedBy=products.CreatedBy;         
             prod.ModifiedDate = DateTime.Now;
             prod.IsDeleted = false;
-            var query = _myContext.Products.Update(prod);
+            var update = _myContext.Products.Update(prod);
 
              result = await _myContext.SaveChangesAsync();
             

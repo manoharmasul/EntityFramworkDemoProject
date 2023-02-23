@@ -8,9 +8,9 @@ namespace EntityFramworkDemoProject.Model
         [Required(ErrorMessage = "Created by is required")]
         public long CreatedBy { get; set; }
         [Required(ErrorMessage = "Modified by is required")]
-        public long ModifiedBy { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime ModifiedDate { get; set; }
+        public long? ModifiedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
         public string CreatedDateFormatdate
         {

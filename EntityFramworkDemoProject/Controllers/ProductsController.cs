@@ -22,15 +22,15 @@ namespace EntityFramworkDemoProject.Controllers
             this.configuration = configuration;
         }
         [HttpPost("AddProducts")]
-        public async Task<IActionResult> AddProducts(Products products)
+        public async Task<IActionResult> AddProducts(ProductsInsert prod)
         {
             BaseResponseStatus baseresponse = new BaseResponseStatus();
             try
             {
-                var result = await _productAsyncRepository.AddNewProducts(products);
+                var result = await _productAsyncRepository.AddNewProducts(prod);
                  if(result>0)
                  {
-                    var rtnmsg = string.Format($"Product Added Successfully with Name {products.ProductName}");
+                    var rtnmsg = string.Format($"Product Added Successfully with Name {prod.ProductName}");
                     logger.LogInformation(rtnmsg);
                     logger.LogDebug(string.Format($"ProductsController-AddNewProducts : Complete Adding Product"));
                     baseresponse.StatusMessage = rtnmsg;
@@ -60,7 +60,7 @@ namespace EntityFramworkDemoProject.Controllers
             }
         }
         [HttpPut("UpdateProducts")]
-        public async Task<IActionResult> UpdateProducts(UpdateProduct products)
+        public async Task<IActionResult> UpdateProducts(ProductsInsert products)
         {
             BaseResponseStatus baseresponse = new BaseResponseStatus();
             try
@@ -68,7 +68,7 @@ namespace EntityFramworkDemoProject.Controllers
                 var result = await _productAsyncRepository.UpdateProducts(products);
                 if (result > 0)
                 {
-                    var rtnmsg = string.Format($"Product Updated Successfully with Name {products.Id}");
+                    var rtnmsg = string.Format($"Product Updated Successfully with Name {products.ProductName}");
                     logger.LogInformation(rtnmsg);
                     logger.LogDebug(string.Format($"ProductsController-UpdateProducts : Complete Updating Product"));
                     baseresponse.StatusMessage = rtnmsg;
